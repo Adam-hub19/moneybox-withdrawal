@@ -20,21 +20,16 @@ namespace Moneybox.App.Features
             var from = this.accountRepository.GetAccountById(fromAccountId);
             var to = this.accountRepository.GetAccountById(toAccountId);
 
-            var fromBalance = from.Balance - amount;
-            if (fromBalance < 0m)
-            {
-                throw new InvalidOperationException("Insufficient funds to make transfer");
-            }
+            if (from.FundsAreAvailable(fromAccountId,amount) && to.checkPayInLimit(amount))
+             {
+                from.Withdraw(amount);
+                to.Deposit(amount);
+             }
+          
 
-            if (fromBalance < 500m)
+            if (from.Balance < 500m)
             {
                 this.notificationService.NotifyFundsLow(from.User.Email);
-            }
-
-            var paidIn = to.PaidIn + amount;
-            if (paidIn > Account.PayInLimit)
-            {
-                throw new InvalidOperationException("Account pay in limit reached");
             }
 
             if (Account.PayInLimit - paidIn < 500m)
@@ -42,11 +37,6 @@ namespace Moneybox.App.Features
                 this.notificationService.NotifyApproachingPayInLimit(to.User.Email);
             }
 
-            from.Balance = from.Balance - amount;
-            from.Withdrawn = from.Withdrawn - amount;
-
-            to.Balance = to.Balance + amount;
-            to.PaidIn = to.PaidIn + amount;
 
             this.accountRepository.Update(from);
             this.accountRepository.Update(to);

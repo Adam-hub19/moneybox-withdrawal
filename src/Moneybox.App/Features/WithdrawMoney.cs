@@ -18,6 +18,24 @@ namespace Moneybox.App.Features
         public void Execute(Guid fromAccountId, decimal amount)
         {
             // TODO:
+
+            // get the account to withdraw from
+            var from = this.accountRepository.GetAccountById(fromAccountId);
+
+            // do validate and withdraw the money
+
+            if (from.FundsAreAvailable(fromAccountId, amount))
+            {
+                from.Withdraw(amount);
+            }
+
+            
+            if (from.Balance < 500m)
+            {
+                this.notificationService.NotifyFundsLow(from.User.Email);
+            }
+
+             this.accountRepository.Update(from);
         }
     }
 }
