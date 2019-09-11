@@ -24,3 +24,7 @@ As part of this process however, you should look to refactor some of the code in
 Once you have completed your work, send us a link to your public repository.
 
 Good luck!
+## Refactored elements 
+
+* The Account model has been modified to include behaviours to make it rich withstand misuse to some exten
+* The TransferMoney.Execute(...) has been modified with some of its operations moved to the Account class as appropriate.
